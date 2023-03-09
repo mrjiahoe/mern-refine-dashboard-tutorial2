@@ -16,9 +16,13 @@ const createUser = async (req, res) => {
 
 		const userExists = await User.findOne({ email });
 
-		if (userExists) return res.stats(200).json(userExists);
+		if (userExists) return res.status(200).json(userExists);
 
-		const newUser = await User.create({ name, email, avatar });
+		const newUser = await User.create({
+			name,
+			email,
+			avatar,
+		});
 
 		res.status(200).json(newUser);
 	} catch (error) {
@@ -26,6 +30,20 @@ const createUser = async (req, res) => {
 	}
 };
 
-const getUserInfoByID = async (req, res) => {};
+const getUserInfoByID = async (req, res) => {
+	try {
+		const { id } = req.params;
+
+		const user = await User.findOne({ _id: id }).populate('allProperties');
+
+		if (user) {
+			res.status(200).json(user);
+		} else {
+			res.status(404).json({ message: 'User not found' });
+		}
+	} catch (error) {
+		res.status(500).json({ message: error.message });
+	}
+};
 
 export { getAllUsers, createUser, getUserInfoByID };
